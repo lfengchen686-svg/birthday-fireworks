@@ -1,0 +1,9 @@
+{
+  "name": "birthday-fireworks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A self-contained birthday fireworks greeting page.",
+  "scripts": {
+    "preview": "node preview-server.cjs"
+  }
+}
