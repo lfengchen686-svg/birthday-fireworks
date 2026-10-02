@@ -1,0 +1,699 @@
+/*
+Copyright © 2022 NianBroken. All rights reserved.
+Github：https://github.com/NianBroken/Firework_Simulator
+Gitee：https://gitee.com/nianbroken/Firework_Simulator
+本项目采用 Apache-2.0 许可证
+简而言之，你可以自由使用、修改和分享本项目的代码，但前提是在其衍生作品中必须保留原始许可证和版权信息，并且必须以相同的许可证发布所有修改过的代码。
+*/
+
+/* 滚动条 */
+::-webkit-scrollbar {
+	width: 0;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+* {
+	position: relative;
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+html {
+	background-color: #000;
+}
+
+body {
+	overflow: hidden;
+	margin: 0;
+	color: rgba(255, 255, 255, 0.5);
+	font-family: "Russo One", arial, sans-serif;
+	line-height: 1.25;
+	letter-spacing: 0.06em;
+}
+
+.hide {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.remove {
+	display: none !important;
+}
+
+.blur {
+	filter: blur(12px);
+}
+
+.container {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.loading-init {
+	width: 100%;
+	align-self: center;
+	text-align: center;
+	text-transform: uppercase;
+}
+.loading-init__header {
+	font-size: 2.2em;
+}
+.loading-init__status {
+	margin-top: 1em;
+	font-size: 0.8em;
+	opacity: 0.75;
+}
+
+.stage-container {
+	overflow: hidden;
+	box-sizing: initial;
+	border: 1px solid #222;
+	margin: -1px;
+}
+@media (max-width: 840px) {
+	.stage-container {
+		border: none;
+		margin: 0;
+	}
+}
+
+.canvas-container {
+	width: 100%;
+	height: 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	transition: filter 0.3s;
+}
+.canvas-container canvas {
+	position: absolute;
+	mix-blend-mode: lighten;
+	transform: translateZ(0);
+}
+
+.controls {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	padding-bottom: 50px;
+	display: flex;
+	justify-content: space-between;
+	transition: opacity 0.3s, visibility 0.3s;
+}
+@media (min-width: 840px) {
+	.controls {
+		visibility: visible;
+	}
+	.controls.hide:hover {
+		opacity: 1;
+	}
+}
+
+.menu {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(0, 0, 0, 0.42);
+	transition: opacity 0.3s, visibility 0.3s;
+}
+.menu__inner-wrap {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	transition: opacity 0.3s;
+}
+.menu__header {
+	margin-top: 5px;
+	margin-bottom: 8px;
+	font-size: 2em;
+	text-transform: uppercase;
+}
+.menu__subheader {
+	margin-bottom: 5px;
+	font-size: 0.86em;
+	opacity: 0.8;
+}
+.menu form {
+	width: 100%;
+	max-width: 400px;
+	padding: 0 10px;
+	margin-right: 80px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.menu .form-option {
+	display: flex;
+	align-items: center;
+	margin: 16px 0;
+	transition: opacity 0.3s;
+}
+.menu .form-option label {
+	display: block;
+	width: 50%;
+	padding-right: 12px;
+	text-align: right;
+	text-transform: uppercase;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.menu .form-option--select select {
+	display: block;
+	width: 50%;
+	height: 30px;
+	font-size: 1rem;
+	font-family: "Russo One", arial, sans-serif;
+	color: rgba(255, 255, 255, 0.5);
+	letter-spacing: 0.06em;
+	background-color: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.menu .form-option--select select option {
+	background-color: black;
+}
+.menu .form-option--checkbox input {
+	display: block;
+	width: 26px;
+	height: 26px;
+	margin: 0;
+	opacity: 0.5;
+}
+.menu .form-option--stacked {
+	align-items: flex-start;
+}
+.menu .form-option--stacked .form-option__content {
+	width: 50%;
+}
+.menu .background-input {
+	width: 100%;
+	height: 30px;
+	padding: 0 8px;
+	font-size: 0.9rem;
+	font-family: "Russo One", arial, sans-serif;
+	color: rgba(255, 255, 255, 0.75);
+	letter-spacing: 0.04em;
+	background-color: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.menu .background-input::placeholder {
+	color: rgba(255, 255, 255, 0.35);
+}
+.menu .form-option__actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+}
+.menu .form-option__actions button {
+	flex: 1;
+	height: 30px;
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	font-family: "Russo One", arial, sans-serif;
+	font-size: 0.76rem;
+	color: rgba(255, 255, 255, 0.75);
+	background-color: rgba(255, 255, 255, 0.08);
+	letter-spacing: 0.04em;
+	cursor: pointer;
+}
+.menu .form-option__actions button:focus-visible,
+.menu .background-input:focus-visible,
+.menu .form-option--select select:focus-visible,
+.help-modal__close-btn:focus-visible {
+	outline: 1px solid rgba(255, 255, 255, 0.7);
+	outline-offset: 1px;
+}
+.menu .background-status {
+	min-height: 1.2em;
+	margin-top: 8px;
+	font-size: 0.72rem;
+	line-height: 1.4;
+	color: rgba(255, 255, 255, 0.45);
+}
+.menu .background-status[data-state="loading"] {
+	color: rgba(255, 255, 255, 0.65);
+}
+.menu .background-status[data-state="success"] {
+	color: #8fd18f;
+}
+.menu .background-status[data-state="error"] {
+	color: #ff8b8b;
+}
+@media (max-width: 840px) {
+	.menu .form-option select,
+	.menu .form-option input {
+		outline: none;
+	}
+}
+@media (max-width: 560px) {
+	.menu .form-option {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.menu .form-option label,
+	.menu .form-option--stacked .form-option__content,
+	.menu .form-option--select select {
+		width: 100%;
+	}
+	.menu .form-option label {
+		padding-right: 0;
+		margin-bottom: 8px;
+		text-align: left;
+	}
+}
+
+.close-menu-btn {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.btn {
+	opacity: 0.16;
+	width: 50px;
+	height: 50px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	appearance: none;
+	display: flex;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: pointer;
+	transition: opacity 0.3s;
+}
+.btn--bright {
+	opacity: 0.5;
+}
+@media (min-width: 840px) {
+	.btn:hover {
+		opacity: 0.32;
+	}
+	.btn--bright:hover {
+		opacity: 0.75;
+	}
+}
+.btn svg {
+	display: block;
+	margin: auto;
+}
+.btn:focus-visible {
+	outline: 1px solid rgba(255, 255, 255, 0.7);
+	outline-offset: -2px;
+}
+
+.credits {
+	margin-top: auto;
+	margin-bottom: 10px;
+	padding-top: 6px;
+	font-size: 0.8em;
+	opacity: 0.75;
+	text-align: center;
+}
+.credits a {
+	color: rgba(255, 255, 255, 0.5);
+	text-decoration: none;
+}
+.credits a:hover,
+.credits a:active {
+	color: rgba(255, 255, 255, 0.75);
+	text-decoration: underline;
+}
+
+.help-modal {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	visibility: hidden;
+	transition-property: visibility;
+	transition-duration: 0.25s;
+}
+.help-modal__overlay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 0;
+	transition-property: opacity;
+	transition-timing-function: ease-in;
+	transition-duration: 0.25s;
+}
+.help-modal__dialog {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: 400px;
+	max-height: calc(100vh - 100px);
+	margin: 10px;
+	padding: 20px;
+	border-radius: 0.3em;
+	background-color: rgba(0, 0, 0, 0.4);
+	opacity: 0;
+	transform: scale(0.9, 0.9);
+	transition-property: opacity, transform;
+	transition-timing-function: ease-in;
+	transition-duration: 0.25s;
+}
+@media (min-width: 840px) {
+	.help-modal__dialog {
+		font-size: 1.25rem;
+		max-width: 500px;
+	}
+}
+.help-modal__header {
+	font-size: 1.75em;
+	text-transform: uppercase;
+	text-align: center;
+}
+.help-modal__body {
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	margin: 1em 0;
+	padding: 1em 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.25);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.75);
+}
+.help-modal__close-btn {
+	flex-shrink: 0;
+	outline: none;
+	border: none;
+	border-radius: 2px;
+	padding: 0.25em 0.75em;
+	margin-top: 0.36em;
+	font-family: "Russo One", arial, sans-serif;
+	font-size: 1em;
+	color: rgba(255, 255, 255, 0.5);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	background-color: rgba(255, 255, 255, 0.25);
+	cursor: pointer;
+	transition: color 0.3s, background-color 0.3s;
+}
+.help-modal__close-btn:hover,
+.help-modal__close-btn:active,
+.help-modal__close-btn:focus {
+	color: #fff;
+	background-color: #09f;
+}
+.help-modal.active {
+	visibility: visible;
+	transition-duration: 0.4s;
+}
+.help-modal.active .help-modal__overlay {
+	opacity: 1;
+	transition-timing-function: ease-out;
+	transition-duration: 0.4s;
+}
+.help-modal.active .help-modal__dialog {
+	opacity: 1;
+	transform: scale(1, 1);
+	transition-timing-function: ease-out;
+	transition-duration: 0.4s;
+}
+
+/* Birthday adaptation: keep the simulator's batched two-canvas renderer,
+   and place the greeting as a separate lightweight presentation layer. */
+html,
+body {
+	height: 100%;
+	background: #07142d;
+}
+
+.container {
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+}
+
+.stage-container {
+	width: 100vw !important;
+	height: 100vh !important;
+	max-width: none;
+	max-height: none;
+	border: 0 !important;
+	margin: 0 !important;
+}
+
+.canvas-container {
+	width: 100% !important;
+	height: 100% !important;
+	background-image:
+		linear-gradient(180deg, rgba(4, 12, 36, 0.22), rgba(5, 15, 39, 0.02) 48%, rgba(2, 7, 24, 0.36)),
+		url('../assets/lake-dusk.png') !important;
+	background-position: center !important;
+	background-repeat: no-repeat !important;
+	background-size: cover !important;
+	background-color: #07142d !important;
+}
+
+.canvas-container canvas {
+	image-rendering: auto;
+	mix-blend-mode: lighten;
+}
+
+.controls,
+.menu,
+.help-modal {
+	display: none !important;
+}
+
+.birthday-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 10;
+	overflow: hidden;
+	pointer-events: none;
+	background: radial-gradient(ellipse at 50% 50%, transparent 22%, rgba(1, 5, 20, 0.08) 64%, rgba(1, 3, 16, 0.36) 100%);
+}
+
+.birthday-mark,
+.birthday-subtitle,
+.birthday-intro,
+.birthday-status,
+.birthday-sound {
+	position: absolute;
+	z-index: 3;
+}
+
+.birthday-mark {
+	top: clamp(24px, 5vh, 58px);
+	left: clamp(22px, 5vw, 78px);
+	color: rgba(255, 226, 179, 0.8);
+	font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+	font-size: 12px;
+	letter-spacing: 0.22em;
+	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.42);
+}
+
+.birthday-subtitle {
+	top: calc(clamp(24px, 5vh, 58px) + 25px);
+	left: clamp(22px, 5vw, 78px);
+	color: rgba(255, 247, 232, 0.82);
+	font-family: 'Noto Serif SC', 'Songti SC', serif;
+	font-size: 15px;
+	letter-spacing: 0.18em;
+	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.42);
+}
+
+.birthday-intro {
+	top: 51%;
+	left: 50%;
+	z-index: 4;
+	width: min(90vw, 900px);
+	padding: 26px 30px;
+	color: #ffe7ad;
+	font-family: 'KaiTi', 'STKaiti', 'DFKai-SB', 'Noto Serif SC', serif;
+	font-size: clamp(30px, 4vw, 58px);
+	font-weight: 700;
+	line-height: 1.45;
+	letter-spacing: 0.09em;
+	text-align: center;
+	text-shadow:
+		0 0 1px rgba(255, 255, 245, 1),
+		0 2px 0 rgba(38, 8, 35, 1),
+		0 0 16px rgba(255, 207, 127, 0.92),
+		0 6px 26px rgba(5, 3, 22, 1);
+	-webkit-text-stroke: 0.8px rgba(38, 8, 35, 0.92);
+	opacity: 0;
+	transform: translate(-50%, -50%) scale(0.98);
+	transition: opacity 700ms ease, transform 700ms ease;
+	pointer-events: none;
+}
+
+#birthday-particle-canvas {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+#birthday-song {
+	display: none;
+}
+
+.birthday-wish {
+	isolation: isolate;
+	position: absolute;
+	top: 51%;
+	left: 50%;
+	z-index: 2;
+	width: min(86vw, 1080px);
+	padding: 28px 36px;
+	background: radial-gradient(
+		ellipse at center,
+		rgba(7, 10, 38, 0.86) 0%,
+		rgba(7, 10, 38, 0.64) 46%,
+		rgba(7, 10, 38, 0.22) 72%,
+		transparent 86%
+	);
+	color: #ffdda0;
+	font-family: 'KaiTi', 'STKaiti', 'DFKai-SB', 'Noto Serif SC', serif;
+	font-size: 42px;
+	font-weight: 700;
+	line-height: 1.5;
+	letter-spacing: 0.055em;
+	text-align: center;
+	text-shadow:
+		0 0 2px rgba(255, 255, 242, 1),
+		0 0 14px rgba(255, 194, 112, 0.92),
+		0 4px 20px rgba(0, 2, 18, 0.98);
+	-webkit-text-stroke: 0.65px rgba(53, 12, 42, 0.9);
+	opacity: 0;
+	visibility: visible !important;
+	display: block !important;
+	transform: translate(-50%, -50%) scale(0.985);
+	filter: blur(0);
+	transition: opacity 120ms linear, transform 120ms linear, filter 120ms linear;
+}
+
+.birthday-wish::before {
+	position: absolute;
+	inset: -38% -12%;
+	z-index: -1;
+	content: '';
+	border-radius: 50%;
+	background: radial-gradient(ellipse, rgba(2, 8, 31, 0.78), rgba(3, 9, 31, 0.42) 44%, transparent 76%);
+	filter: blur(10px);
+}
+
+.birthday-wish span {
+	display: block;
+	white-space: nowrap;
+	color: #ffdda0;
+	text-shadow:
+		0 0 2px rgba(255, 255, 239, 0.98),
+		0 0 13px rgba(255, 189, 105, 0.9),
+		0 3px 18px rgba(0, 2, 18, 0.98);
+}
+
+.birthday-status {
+	top: clamp(28px, 5vh, 60px);
+	right: clamp(22px, 5vw, 78px);
+	color: rgba(255, 247, 232, 0.72);
+	font-family: 'Noto Serif SC', 'Songti SC', serif;
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.48);
+}
+
+.birthday-status::before {
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	margin-right: 8px;
+	border-radius: 50%;
+	background: #ffd77d;
+	box-shadow: 0 0 13px 3px rgba(255, 210, 124, 0.68);
+	content: '';
+}
+
+.birthday-sound {
+	right: clamp(22px, 5vw, 78px);
+	bottom: clamp(24px, 5vh, 58px);
+	min-height: 42px;
+	padding: 0 18px 0 14px;
+	border: 1px solid rgba(255, 225, 178, 0.34);
+	border-radius: 999px;
+	background: rgba(7, 18, 47, 0.48);
+	color: rgba(255, 247, 232, 0.9);
+	box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24), inset 0 1px rgba(255, 255, 255, 0.08);
+	backdrop-filter: blur(12px);
+	cursor: pointer;
+	font-family: 'Noto Serif SC', 'Songti SC', serif;
+	font-size: 12px;
+	letter-spacing: 0.06em;
+	pointer-events: auto;
+	transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.birthday-sound:hover,
+.birthday-sound:focus-visible,
+.birthday-sound.is-enabled {
+	border-color: rgba(255, 214, 145, 0.8);
+	background: rgba(38, 25, 64, 0.64);
+	color: #ffe2a9;
+	outline: none;
+	transform: translateY(-2px);
+}
+
+.birthday-sound span {
+	display: inline-grid;
+	width: 22px;
+	height: 22px;
+	margin-right: 7px;
+	place-items: center;
+	border: 1px solid rgba(255, 217, 154, 0.38);
+	border-radius: 50%;
+	color: #ffd48b;
+	font-family: Georgia, serif;
+	font-size: 15px;
+}
+
+@media (max-width: 640px) {
+	.birthday-mark { top: 22px; left: 20px; font-size: 9px; letter-spacing: 0.16em; }
+	.birthday-subtitle { top: 43px; left: 20px; font-size: 12px; letter-spacing: 0.1em; }
+	.birthday-status { top: 23px; right: 20px; font-size: 9px; }
+	.birthday-intro { width: 92vw; padding: 18px 12px; letter-spacing: 0.04em; }
+	.birthday-wish { width: 90vw; padding: 12px 6px; letter-spacing: 0.025em; line-height: 1.45; }
+	.birthday-wish span { white-space: normal; }
+	.birthday-sound { right: 20px; bottom: 22px; font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.birthday-wish { transition: none; }
+}
